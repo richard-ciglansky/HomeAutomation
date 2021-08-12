@@ -116,6 +116,7 @@ body {
   color: white; }
   .bottom a {
     color: white; }
+
             
         </style>
         
@@ -156,15 +157,20 @@ function initBlinderSlider(sliderRoot, sliderUrl) {
     };
 
     var statusFireInterval = null;
-    var status;
+    var status, lastStatus;
     var currentStatusAjax = null;
     
     
     function fireStatus()
     {
         if ( currentStatusAjax )
-            return;
-        
+        {
+            if ( status == lastStatus )
+                return;
+            currentStatusAjax.abort();
+        }
+        lastStatus = status;
+                
         currentStatusAjax = $.ajax( sliderUrl + status, {
             accepts: "text/plain",
             method: "PUT"
@@ -203,26 +209,13 @@ function initBlinderSlider(sliderRoot, sliderUrl) {
             var currentMouse = handler.currentMouse(event); // event.clientX || event.changedTouches[0].pageX;
             var relativeMouse = currentMouse - initialMouse;
 
-            if (relativeMouse < slideMovementTotal) {
-                    handler.animateSliderReturn(slider);
-                    return;
-            }
-            slider.addClass('unlocked');
-            $('i[data-id="locker"]', sliderRoot).text('lock_outline');
-            setTimeout(function(){
-                    slider.on('click tap', function(event){
-                            if (!slider.hasClass('unlocked'))
-                                    return;
-                            slider.removeClass('unlocked');
-                            $('i[data-id="locker"]', sliderRoot).text('lock_open');
-                            slider.off('click tap');
-                    });
-            }, 0);
+            handler.animateSliderReturn(slider);
     });
 
     $(document.body).on('mousemove touchmove', function(event){
             if (!mouseIsDown)
                     return;
+
             var currentMouse = handler.currentMouse(event) ;     // )event.clientX || event.originalEvent.touches[0].pageX;
             var relativeMouse = currentMouse - initialMouse;
             var slidePercent = 1 - (relativeMouse / slideMovementTotal);
@@ -237,25 +230,36 @@ function initBlinderSlider(sliderRoot, sliderUrl) {
                 status = relativeMouse > 0 ? "/down" : (relativeMouse < 0 ? "/up" : "/stop");
                 handler.positionSlider(slider, relativeMouse-16);            
             }
+                        
     });
+
 }
+                       
         </script>
     </head>
+    
     <body onload="initBlinderSlider($('#blinderA'), '/blinders/A');initBlinderSlider($('#blinderB'), '/blinders/B')">
+        
+        
         <div id="blinderA"  class="swipe">
             <div class="button-background" data-id="button-background">
                     <div data-id="slider" class="blinderslider">
                     </div>
             </div>            
         </div>
+        
         <div id="blinderB"  class="swipe">
             <div class="button-background" data-id="button-background">
                     <div data-id="slider" class="blinderslider">
                     </div>
             </div>            
         </div>
+        
+        
+        
     </body>
 </html>
+
 )rawliteral";
 
 
