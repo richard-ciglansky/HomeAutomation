@@ -287,7 +287,7 @@ String processor(const String& var){
 }
 
 
-void setupRelay(AsyncWebServer& server, sk::softar::iot::Blinders* blinders, std::string path)
+void setupRelay(AsyncWebServer& server, std::string path, sk::softar::iot::Blinders* blinders)
 {
   server.on( (path + "/up").c_str(), HTTP_PUT, [blinders] (AsyncWebServerRequest *request) {
     Serial.println(request->url().c_str());
@@ -316,7 +316,7 @@ void setupWebServer(AsyncWebServer& server, std::map<const char*, sk::softar::io
   });
 
   for ( auto bp = blinders.begin(); bp != blinders.end(); bp++ )
-    setupRelay(server, bp->second, bp->first);
+    setupRelay(server, bp->first, bp->second);
 
   // Start server
   server.begin();    

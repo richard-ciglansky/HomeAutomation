@@ -23,13 +23,13 @@
 #include "blindersMQTT.h"
 #include "webServer.h"
 
-#define RELAY_POWER_PIN            (12)
-#define RELAY_DIRECTION_PIN        (13)
+#define RELAY_POWER_PIN_A            (12)
+#define RELAY_DIRECTION_PIN_A        (14)
 
 #define RELAY_POWER_PIN_B            (4)
 #define RELAY_DIRECTION_PIN_B        (5)
 
-#define TOPIC      "/output/poschodie/emka/blinders"
+#define TOPIC_A    "/output/poschodie/emka/blinders"
 #define TOPIC_B    "/output/poschodie/galeria/blinders"
 
 #define BLINDER_URL_A   "/blinders/A"
@@ -45,12 +45,12 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 AsyncWebServer webServer(80);
 
-sk::softar::iot::Blinders blindersA(RELAY_POWER_PIN, RELAY_DIRECTION_PIN);
-sk::softar::iot::Blinders blindersB(RELAY_POWER_PIN_B, RELAY_DIRECTION_PIN_B);
+sk::softar::iot::Blinders blindersA(RELAY_POWER_PIN_A, RELAY_DIRECTION_PIN_A, 400U);
+sk::softar::iot::Blinders blindersB(RELAY_POWER_PIN_B, RELAY_DIRECTION_PIN_B, 400U);
 
 
 std::map<const char*, sk::softar::iot::Blinders*, sk::softar::iot::cmp_str> blindersMQTTMap = {
-  { TOPIC, &blindersA },
+  { TOPIC_A, &blindersA },
   { TOPIC_B, &blindersB}
 };
 
