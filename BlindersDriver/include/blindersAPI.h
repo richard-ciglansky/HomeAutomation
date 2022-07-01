@@ -26,7 +26,13 @@ namespace sk::softar::iot {
     public:
         Blinders(uint8_t aPowerPin, uint8_t aDirectionPin, uint32_t aTimeoutValue = 500) 
         : powerPin(aPowerPin), directionPin(aDirectionPin), timeoutValue(aTimeoutValue)//, movementTimeout( [this](void) -> void { Serial.println("Timeout stopping movement."); this->blindersStop(); }, 500000, 1)
-        { }
+        {
+        pinMode(powerPin, OUTPUT);
+        pinMode(directionPin, OUTPUT);
+
+        digitalWrite(powerPin, HIGH);
+        digitalWrite(directionPin, HIGH); // Without this there would be motor movement when powered on
+        }
 
         Blinders(const Blinders& b)
         : powerPin(b.powerPin), directionPin(b.directionPin)//, movementTimeout( [this](void) -> void { Serial.println("Timeout stopping movement."); this->blindersStop(); }, 500000, 1)
@@ -44,14 +50,14 @@ namespace sk::softar::iot {
         virtual void blindersMove(uint8_t direction) {
             std::string m = "PIN " + std::to_string(directionPin) + std::string(" = ") + std::to_string(direction);
             Serial.println(m.c_str());
-            m = "PIN " + std::to_string(powerPin) + std::string(" = ") + std::to_string(HIGH);
+            m = "PIN " + std::to_string(powerPin) + std::string(" = ") + std::to_string(LOW);
             Serial.println(m.c_str());
 
             // setup correct direction
             digitalWrite(directionPin, direction);
 
             // enforce power to the proper side of the motor
-            digitalWrite(powerPin, HIGH);
+            digitalWrite(powerPin, LOW);
 
             // setup timeout for working without another command
             movementTimeout.detach();
@@ -63,14 +69,14 @@ namespace sk::softar::iot {
         };  
 
     public:
-        virtual void blindersUp() { blindersMove(HIGH); }
-        virtual void blindersDown() { blindersMove(LOW); }
+        virtual void blindersUp() { blindersMove(LOW); }
+        virtual void blindersDown() { blindersMove(HIGH); }
         virtual void blindersStop() { 
-                std::string m = "PIN " + std::to_string(powerPin) + std::string(" = ") + std::to_string(LOW);
+                std::string m = "PIN " + std::to_string(powerPin) + std::string(" = ") + std::to_string(HIGH);
                 Serial.println(m.c_str());
 
                 // cutting OFF the power from the device
-                digitalWrite(powerPin, LOW); 
+                digitalWrite(powerPin, HIGH); 
 
                 // cancel the timeout
                 movementTimeout.detach();
